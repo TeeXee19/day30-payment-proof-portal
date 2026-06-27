@@ -1,0 +1,139 @@
+{
+  "compilerOptions": {
+    "forceConsistentCasingInFileNames": true,
+    "strict": true,
+    "noEmit": true,
+    "skipLibCheck": true,
+    "target": "ESNext",
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "allowJs": true,
+    "resolveJsonModule": true,
+    "jsx": "preserve",
+    "allowSyntheticDefaultImports": true,
+    "jsxFactory": "h",
+    "jsxFragmentFactory": "Fragment",
+    "paths": {
+      "#imports": [
+        "./types/nitro-imports"
+      ],
+      "~/*": [
+        "../*"
+      ],
+      "@/*": [
+        "../*"
+      ],
+      "~~/*": [
+        "../*"
+      ],
+      "@@/*": [
+        "../*"
+      ],
+      "nuxt": [
+        "../node_modules/.pnpm/nuxt@4.4.8_@babel+plugin-sy_ee0172306852471ddda1f1c29eb56bf9/node_modules/nuxt"
+      ],
+      "@unhead/vue": [
+        "../node_modules/.pnpm/@unhead+vue@2.1.15_vue@3.5.39/node_modules/@unhead/vue"
+      ],
+      "@nuxt/devtools": [
+        "../node_modules/.pnpm/@nuxt+devtools@3.2.4_vite@7_b0640990c1479752261d815bfb5ad99c/node_modules/@nuxt/devtools"
+      ],
+      "@vue/runtime-core": [
+        "../node_modules/.pnpm/@vue+runtime-core@3.5.39/node_modules/@vue/runtime-core"
+      ],
+      "@vue/compiler-sfc": [
+        "../node_modules/.pnpm/@vue+compiler-sfc@3.5.39/node_modules/@vue/compiler-sfc"
+      ],
+      "@nuxt/schema": [
+        "../node_modules/.pnpm/@nuxt+schema@4.4.8/node_modules/@nuxt/schema"
+      ],
+      "defu": [
+        "../node_modules/.pnpm/defu@6.1.7/node_modules/defu"
+      ],
+      "h3": [
+        "../node_modules/.pnpm/h3@1.15.11/node_modules/h3"
+      ],
+      "consola": [
+        "../node_modules/.pnpm/consola@3.4.2/node_modules/consola"
+      ],
+      "ofetch": [
+        "../node_modules/.pnpm/ofetch@1.5.1/node_modules/ofetch"
+      ],
+      "crossws": [
+        "../node_modules/.pnpm/crossws@0.3.5/node_modules/crossws"
+      ],
+      "nitropack": [
+        "../node_modules/.pnpm/nitropack@2.13.4_oxc-parser_0442167e25a702b4d3fdc3c2b41aaac7/node_modules/nitropack"
+      ],
+      "vite/client": [
+        "../node_modules/.pnpm/vite@7.3.6_jiti@2.7.0_terser@5.48.0_yaml@2.9.0/node_modules/vite/client"
+      ],
+      "nitropack/types": [
+        "../node_modules/.pnpm/nitropack@2.13.4_oxc-parser_0442167e25a702b4d3fdc3c2b41aaac7/node_modules/nitropack/types"
+      ],
+      "nitropack/runtime": [
+        "../node_modules/.pnpm/nitropack@2.13.4_oxc-parser_0442167e25a702b4d3fdc3c2b41aaac7/node_modules/nitropack/runtime"
+      ],
+      "#shared": [
+        "../shared"
+      ],
+      "#shared/*": [
+        "../shared/*"
+      ],
+      "#server": [
+        "../server"
+      ],
+      "#server/*": [
+        "../server/*"
+      ],
+      "#build": [
+        "./"
+      ],
+      "#build/*": [
+        "./*"
+      ],
+      "#internal/nuxt/paths": [
+        "../node_modules/.pnpm/@nuxt+nitro-server@4.4.8_@b_678bdcc9efa2fd3d0d76d3c4fc901b1a/node_modules/@nuxt/nitro-server/dist/runtime/utils/paths"
+      ],
+      "#unhead/composables": [
+        "../node_modules/.pnpm/nuxt@4.4.8_@babel+plugin-sy_ee0172306852471ddda1f1c29eb56bf9/node_modules/nuxt/dist/head/runtime/composables"
+      ],
+      "#supabase/server": [
+        "../node_modules/.pnpm/@nuxtjs+supabase@2.0.9/node_modules/@nuxtjs/supabase/dist/runtime/server/services"
+      ],
+      "#supabase/server/*": [
+        "../node_modules/.pnpm/@nuxtjs+supabase@2.0.9/node_modules/@nuxtjs/supabase/dist/runtime/server/services/*"
+      ],
+      "#supabase/database": [
+        "./types/supabase-database"
+      ]
+    },
+    "lib": [
+      "esnext",
+      "webworker",
+      "dom.iterable"
+    ],
+    "noUncheckedIndexedAccess": true,
+    "allowArbitraryExtensions": true
+  },
+  "include": [
+    "./types/nitro-nuxt.d.ts",
+    "../node_modules/.pnpm/@nuxtjs+supabase@2.0.9/node_modules/runtime/server",
+    "../node_modules/.pnpm/@nuxtjs+supabase@2.0.9/node_modules/dist/runtime/server",
+    "../node_modules/.pnpm/@nuxt+devtools@3.2.4_vite@7_b0640990c1479752261d815bfb5ad99c/node_modules/runtime/server",
+    "../node_modules/.pnpm/@nuxt+devtools@3.2.4_vite@7_b0640990c1479752261d815bfb5ad99c/node_modules/dist/runtime/server",
+    "../node_modules/.pnpm/@nuxt+telemetry@2.8.0_@nuxt+kit@4.4.8_magicast@0.5.3_/node_modules/runtime/server",
+    "../node_modules/.pnpm/@nuxt+telemetry@2.8.0_@nuxt+kit@4.4.8_magicast@0.5.3_/node_modules/dist/runtime/server",
+    "../server/**/*",
+    "../shared/**/*.d.ts",
+    "./types/nitro.d.ts"
+  ],
+  "exclude": [
+    "../node_modules",
+    "../node_modules/.pnpm/nuxt@4.4.8_@babel+plugin-sy_ee0172306852471ddda1f1c29eb56bf9/node_modules/nuxt/node_modules",
+    "../node_modules/.pnpm/@nuxtjs+supabase@2.0.9/node_modules/@nuxtjs/supabase/node_modules",
+    "../node_modules/.pnpm/@nuxt+devtools@3.2.4_vite@7_b0640990c1479752261d815bfb5ad99c/node_modules/@nuxt/devtools/node_modules",
+    "../node_modules/.pnpm/@nuxt+telemetry@2.8.0_@nuxt+kit@4.4.8_magicast@0.5.3_/node_modules/@nuxt/telemetry/node_modules",
+    "../dist"
+  ]
+}
