@@ -3,10 +3,11 @@ import { Server } from 'node:http';
 import { resolve, dirname, join } from 'node:path';
 import nodeCrypto from 'node:crypto';
 import { parentPort, threadId } from 'node:worker_threads';
-import { defineEventHandler, handleCacheHeaders, splitCookiesString, createEvent, fetchWithEvent, isEvent, eventHandler, setHeaders, createError, sendRedirect, proxyRequest, getRequestHeader, setResponseHeaders, setResponseStatus, send, getRequestHeaders, setResponseHeader, appendResponseHeader, getRequestURL, getResponseHeader, removeResponseHeader, getQuery as getQuery$1, readBody, createApp, createRouter as createRouter$1, toNodeListener, lazyEventHandler, getResponseStatus, getRouterParam, getResponseStatusText } from 'file://C:/Users/HomePC/Downloads/Compressed/day30-payment-proof-portal/node_modules/.pnpm/h3@1.15.11/node_modules/h3/dist/index.mjs';
+import { defineEventHandler, handleCacheHeaders, splitCookiesString, createEvent, fetchWithEvent, isEvent, eventHandler, setHeaders, createError, sendRedirect, proxyRequest, getRequestHeader, setResponseHeaders, setResponseStatus, send, getRequestHeaders, setResponseHeader, appendResponseHeader, getRequestURL, getResponseHeader, removeResponseHeader, getQuery as getQuery$1, readBody, createApp, createRouter as createRouter$1, toNodeListener, lazyEventHandler, getResponseStatus, getRouterParam, sendError, getResponseStatusText } from 'file://C:/Users/HomePC/Downloads/Compressed/day30-payment-proof-portal/node_modules/.pnpm/h3@1.15.11/node_modules/h3/dist/index.mjs';
 import { escapeHtml } from 'file://C:/Users/HomePC/Downloads/Compressed/day30-payment-proof-portal/node_modules/.pnpm/@vue+shared@3.5.39/node_modules/@vue/shared/dist/shared.cjs.js';
 import viteNodeEntry_mjs from 'file://C:/Users/HomePC/Downloads/Compressed/day30-payment-proof-portal/node_modules/.pnpm/@nuxt+vite-builder@4.4.8_@b_1fee0b28b6b9144fad44468aec5a4428/node_modules/@nuxt/vite-builder/dist/vite-node-entry.mjs';
 import { viteNodeFetch } from 'file://C:/Users/HomePC/Downloads/Compressed/day30-payment-proof-portal/node_modules/.pnpm/@nuxt+vite-builder@4.4.8_@b_1fee0b28b6b9144fad44468aec5a4428/node_modules/@nuxt/vite-builder/dist/vite-node.mjs';
+import { createClient } from 'file://C:/Users/HomePC/Downloads/Compressed/day30-payment-proof-portal/node_modules/.pnpm/@supabase+supabase-js@2.108.2/node_modules/@supabase/supabase-js/dist/index.mjs';
 import { createRenderer, getRequestDependencies, getPreloadLinks, getPrefetchLinks } from 'file://C:/Users/HomePC/Downloads/Compressed/day30-payment-proof-portal/node_modules/.pnpm/vue-bundle-renderer@2.3.1/node_modules/vue-bundle-renderer/dist/runtime.mjs';
 import { parseURL, withoutBase, joinURL, getQuery, withQuery, withTrailingSlash, decodePath, withLeadingSlash, withoutTrailingSlash, encodePath, joinRelativeURL } from 'file://C:/Users/HomePC/Downloads/Compressed/day30-payment-proof-portal/node_modules/.pnpm/ufo@1.6.4/node_modules/ufo/dist/index.mjs';
 import destr, { destr as destr$1 } from 'file://C:/Users/HomePC/Downloads/Compressed/day30-payment-proof-portal/node_modules/.pnpm/destr@2.0.5/node_modules/destr/dist/index.mjs';
@@ -2715,10 +2716,12 @@ async function getIslandContext(event) {
 	};
 }
 
+const _lazy_IlF2Uo = () => Promise.resolve().then(function () { return submit_post$1; });
 const _lazy_ly3ai2 = () => Promise.resolve().then(function () { return renderer; });
 
 const handlers = [
   { route: '', handler: _AlICAZ, lazy: false, middleware: true, method: undefined },
+  { route: '/api/submit', handler: _lazy_IlF2Uo, lazy: true, middleware: false, method: "post" },
   { route: '/__nuxt_error', handler: _lazy_ly3ai2, lazy: true, middleware: false, method: undefined },
   { route: '/__nuxt_island/**', handler: handler$1, lazy: false, middleware: false, method: undefined },
   { route: '/**', handler: _lazy_ly3ai2, lazy: true, middleware: false, method: undefined }
@@ -3071,6 +3074,40 @@ const styles = {};
 const styles$1 = /*#__PURE__*/Object.freeze(/*#__PURE__*/Object.defineProperty({
   __proto__: null,
   default: styles
+}, Symbol.toStringTag, { value: 'Module' }));
+
+const SUPABASE_URL = process.env.NUXT_PUBLIC_SUPABASE_URL || "";
+const SUPABASE_KEY = process.env.NUXT_PUBLIC_SUPABASE_ANON_KEY || "";
+const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
+const MAX_FILE_SIZE = 2 * 1024 * 1024;
+const submit_post = defineEventHandler(async (event) => {
+  try {
+    const body = await readBody(event);
+    const { reference_no, full_name, phone, email, payment_date, proof_file_path } = body;
+    if (!reference_no || !proof_file_path) return sendError(event, createError({ statusCode: 400, statusMessage: "Missing parameters" }));
+    const { data, error: downloadError } = await supabase.storage.from("payment-proofs").download(proof_file_path);
+    if (downloadError) return sendError(event, createError({ statusCode: 400, statusMessage: downloadError.message }));
+    let size = 0;
+    if (Buffer.isBuffer(data)) size = data.length;
+    else if (data.arrayBuffer) {
+      const buf = await data.arrayBuffer();
+      size = buf.byteLength;
+    } else if (data.size) size = data.size;
+    if (size > MAX_FILE_SIZE) {
+      await supabase.storage.from("payment-proofs").remove([proof_file_path]);
+      return sendError(event, createError({ statusCode: 413, statusMessage: "File exceeds 2MB limit and was removed" }));
+    }
+    const { error: dbError } = await supabase.from("payment_submissions").insert({ reference_no, full_name, phone, email, payment_date, proof_file_path });
+    if (dbError) return sendError(event, createError({ statusCode: 500, statusMessage: dbError.message }));
+    return { success: true };
+  } catch (e) {
+    return sendError(event, createError({ statusCode: 500, statusMessage: e.message || "Server error" }));
+  }
+});
+
+const submit_post$1 = /*#__PURE__*/Object.freeze(/*#__PURE__*/Object.defineProperty({
+  __proto__: null,
+  default: submit_post
 }, Symbol.toStringTag, { value: 'Module' }));
 
 function renderPayloadResponse(ssrContext) {
