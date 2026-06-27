@@ -18,24 +18,60 @@ function onFile(e: Event){
     file.value = null
     return
   }
-  // set preview for images
   if(filePreviewUrl.value){ URL.revokeObjectURL(filePreviewUrl.value); filePreviewUrl.value = null }
   if(f && f.type.startsWith('image/')) filePreviewUrl.value = URL.createObjectURL(f)
   file.value = f
   error.value = ''
 }
+
+async function compressImage(file: File){
+  if(!file.type.startsWith('image/')) return file
+  const img = new Image()
+  const objectUrl = URL.createObjectURL(file)
+  img.src = objectUrl
+  await new Promise((resolve,reject)=>{
+    img.onload = () => resolve(true)
+    img.onerror = () => reject(new Error('Failed to read image for compression'))
+  })
+  URL.revokeObjectURL(objectUrl)
+  const maxDimension = 1200
+  let { width, height } = img
+  if(width > maxDimension || height > maxDimension){
+    const ratio = Math.min(maxDimension / width, maxDimension / height)
+    width = Math.round(width * ratio)
+    height = Math.round(height * ratio)
+  }
+  const canvas = document.createElement('canvas')
+  canvas.width = width
+  canvas.height = height
+  const ctx = canvas.getContext('2d')
+  if(!ctx) return file
+  ctx.drawImage(img, 0, 0, width, height)
+  const blob = await new Promise<Blob | null>((resolve) => canvas.toBlob(resolve, 'image/jpeg', 0.75))
+  if(!blob) return file
+  const compressedFile = new File([blob], file.name.replace(/\.[^/.]+$/, '.jpg'), { type: 'image/jpeg' })
+  return compressedFile.size < file.size ? compressedFile : file
+}
+
 async function submit(){
   success.value=''; error.value=''
   if(!form.full_name || !form.phone || !form.email || !form.payment_date || !file.value || !form.confirm){ error.value='Please fill all required fields and upload proof of payment.'; return }
   loading.value=true
   try{
-    if(file.value && file.value.size > MAX_FILE_SIZE){ error.value = 'File too large. Maximum allowed size is 2MB.'; loading.value=false; return }
+    let uploadFile = file.value
+    if(uploadFile.type.startsWith('image/')){
+      uploadFile = await compressImage(uploadFile)
+      if(uploadFile.size && uploadFile.size > MAX_FILE_SIZE){
+        error.value = 'File too large after compression. Maximum allowed size is 2MB.'
+        loading.value = false
+        return
+      }
+    }
     const reference_no = generateReference()
-    const ext = file.value.name.split('.').pop()
+    const ext = uploadFile.name.split('.').pop()
     const path = `${reference_no}.${ext}`
-    const { error: uploadError } = await supabase.storage.from('payment-proofs').upload(path, file.value, { upsert:false })
+    const { error: uploadError } = await supabase.storage.from('payment-proofs').upload(path, uploadFile, { upsert:false })
     if(uploadError) throw uploadError
-    // call server endpoint to validate size and insert record (server will remove oversized uploads)
     const res = await fetch('/api/submit', {
       method: 'POST',
       headers: { 'content-type': 'application/json' },
@@ -46,10 +82,8 @@ async function submit(){
       throw new Error(text || 'Server rejected upload')
     }
     success.value = `Submitted successfully. Your reference number is ${reference_no}`
-    // store submission for slip download
     lastSubmission.value = { full_name: form.full_name, phone: form.phone, email: form.email, payment_date: form.payment_date, reference_no }
     lastReference.value = reference_no
-    // trigger automatic download of slip
     await downloadSlip()
     Object.assign(form,{ full_name:'', phone:'', email:'', payment_date:'', confirm:false });
     file.value=null
