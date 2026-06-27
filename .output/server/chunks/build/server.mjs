@@ -612,12 +612,12 @@ const _routes = [
     name: "admin",
     path: "/admin",
     meta: { "middleware": "auth" },
-    component: () => import('./index-CgAHvkto.mjs')
+    component: () => import('./index-C_SfmJnF.mjs')
   },
   {
     name: "index",
     path: "/",
-    component: () => import('./index-CiiklUlI.mjs')
+    component: () => import('./index-BEbvQxeX.mjs')
   }
 ];
 var commonjsGlobal = typeof globalThis !== "undefined" ? globalThis : typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : {};
